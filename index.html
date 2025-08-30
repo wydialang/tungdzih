@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tungdzih Translator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        textarea {
+            width: 80%;
+            height: 100px;
+        }
+        .toggle-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 10px 0;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/cn2t.js"></script>     <!-- For Simplified to Traditional -->
+</head>
+<body>
+    <h1>Tungdzih Translator</h1>
+    <div class="toggle-container">
+        <label for="toggleSimplified">Use Simplified Input:</label>
+        <input type="checkbox" id="toggleSimplified">
+    </div>
+    <textarea id="inputText" placeholder="Enter Simplified or Traditional Chinese characters..."></textarea>
+    <br><br>
+    <button onclick="translate_to_tungdzih()">Translate</button>
+    <button onclick="saveTranslation()">Save Translation</button>
+    <br><br>
+    <textarea id="outputText" readonly></textarea>
+    <h2>Saved Translations</h2>
+    <ul id="savedTranslations"></ul>
+    
+    <script src="script.js"></script>
+</body>
+</html>
