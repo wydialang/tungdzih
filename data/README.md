@@ -33,6 +33,7 @@ python utils/transcription_to_json.py
 
 ## Future ideas
 
-- [ ] Translating the whole website.
+- [ ] Translating the website itself
 - [ ] Estimate translations from Tungdzih back to characters (hard; likely needs a
-      model, since one syllable maps to many characters).
+      model, since one syllable maps to many characters)
+- [ ] Add syllabary translation
