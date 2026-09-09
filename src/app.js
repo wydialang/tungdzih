@@ -195,8 +195,8 @@ function syncChips() {
   } else {
     els.detected.textContent =
       d.confident && d.mode !== resolved
-        ? `Forced ${MODE_LABELS[resolved]} · looks like ${MODE_LABELS[d.mode]}`
-        : `Forced: ${MODE_LABELS[resolved]}`;
+        ? `Selected ${MODE_LABELS[resolved]} · looks like ${MODE_LABELS[d.mode]}`
+        : `Selected: ${MODE_LABELS[resolved]}`;
   }
 }
 
