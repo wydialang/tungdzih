@@ -1,43 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tungdzih Translator</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 20px;
-        }
-        textarea {
-            width: 80%;
-            height: 100px;
-        }
-        .toggle-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 10px 0;
-        }
-    </style>
-    <script src="https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/cn2t.js"></script>     <!-- For Simplified to Traditional -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tungdzih Translator</title>
+  <meta
+    name="description"
+    content="Convert Chinese characters (Traditional, Simplified, or Japanese kanji) into Tungdzih, the General Chinese romanization."
+  />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js"></script>
 </head>
 <body>
-    <h1>Tungdzih Translator</h1>
-    <div class="toggle-container">
-        <label for="toggleSimplified">Use Simplified Input:</label>
-        <input type="checkbox" id="toggleSimplified">
-    </div>
-    <textarea id="inputText" placeholder="Enter Simplified or Traditional Chinese characters..."></textarea>
-    <br><br>
-    <button onclick="translate_to_tungdzih()">Translate</button>
-    <button onclick="saveTranslation()">Save Translation</button>
-    <br><br>
-    <textarea id="outputText" readonly></textarea>
-    <h2>Saved Translations</h2>
-    <ul id="savedTranslations"></ul>
-    
-    <script src="script.js"></script>
+  <div class="wrap">
+    <header class="site-head">
+      <h1>Tungdzih Translator</h1>
+      <p class="tagline">
+        Type Chinese characters &mdash; Traditional, Simplified, or Japanese kanji &mdash;
+        and read them in Tungdzih, the <em>General Chinese</em> romanization that encodes
+        pronunciations across the major Chinese varieties.
+      </p>
+    </header>
+
+    <main>
+      <p id="status" class="status">Loading dictionaries&hellip;</p>
+
+      <div id="translator" class="translator" hidden>
+        <section class="pane pane-input">
+          <div class="pane-head">
+            <div id="chips" class="chips" role="group" aria-label="Input script"></div>
+            <span id="detected" class="detected" aria-live="polite"></span>
+          </div>
+          <textarea
+            id="input"
+            class="input"
+            spellcheck="false"
+            autocomplete="off"
+            placeholder="輸入漢字 / 输入汉字 / 漢字を入力"
+          ></textarea>
+          <div class="pane-foot">
+            <span id="count" class="count">0 chars</span>
+            <button type="button" id="clear-input" class="link-btn">Clear</button>
+          </div>
+        </section>
+
+        <section class="pane pane-output">
+          <div class="pane-head">
+            <label class="switch">
+              <input type="checkbox" id="inline-toggle" />
+              <span>Show all readings inline</span>
+            </label>
+            <div class="actions">
+              <button type="button" id="copy" class="btn">Copy</button>
+              <button type="button" id="save" class="btn btn-primary">Save</button>
+            </div>
+          </div>
+          <div id="output" class="output is-empty" aria-live="polite">
+            Tungdzih output will appear here.
+          </div>
+          <p class="hint">
+            Polyphonic characters are <span class="hint-poly">underlined</span> &mdash;
+            hover or focus to pick a different reading.
+          </p>
+        </section>
+      </div>
+
+      <section class="saved">
+        <div class="saved-head">
+          <h2>Saved translations</h2>
+          <button type="button" id="clear-all" class="link-btn" hidden>Clear all</button>
+        </div>
+        <p id="saved-empty" class="saved-empty">Nothing saved yet.</p>
+        <ul id="saved-list" class="saved-list"></ul>
+      </section>
+    </main>
+
+    <footer class="site-foot">
+      <p>
+        One-directional (characters &rarr; Tungdzih). Script conversion uses
+        <a href="https://github.com/nk2028/opencc-js" rel="noopener">opencc-js</a>;
+        readings follow Y.&nbsp;R.&nbsp;Chao&rsquo;s General Chinese.
+      </p>
+    </footer>
+  </div>
+
+  <script type="module" src="src/app.js"></script>
 </body>
 </html>
