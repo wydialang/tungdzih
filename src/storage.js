@@ -32,6 +32,7 @@ export function save(entry) {
     input: entry.input,
     output: entry.output,
     mode: entry.mode,
+    dataset: entry.dataset,
     ts: Date.now(),
   };
   list.unshift(record);

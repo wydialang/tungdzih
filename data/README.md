@@ -1,15 +1,45 @@
 # Tungdzih translator — data & roadmap
 
-`transcription.txt` is the source of truth: one entry per line, in the format `tungdzih<TAB>traditional`.
+## Dictionaries
 
-`transcription.json` is generated from it by [`../utils/transcription_to_json.py`](../utils/transcription_to_json.py)
-as `{ "<traditional char>": ["reading", ...] }` (first reading = primary).
+The app lets the user choose between reading tables. Each is generated from a
+vendored source by [`../utils/build_datasets.py`](../utils/build_datasets.py):
 
-Regenerate after editing the `.txt`:
+| dataset | vendored source | pinned to |
+|---|---|---|
+| `zime` | [`transcription.txt`](transcription.txt) <- `lotem/zime`: `zime-data/tungdzih/tungdzih-keywords.txt`  | commit `34dcd9f` |
+| `baopaau-rime` | [`baopaau-rime.dict.yaml`](baopaau-rime.dict.yaml) <- `baopaau/rime-tungdzih`: `tungdzih.dict.yaml` | commit `345e0b9` |
+
+`baopaau-rime` is much larger than `zime`; ~17k of its characters are auto-derived
+from Middle Chinese and, per its own upstream README, largely unproofread.
+
+Neither upstream repository carries an explicit licence; the files are vendored
+here with attribution (see the site footer and `README.md`).
+
+### Generated files
+
+`dict/zime.json`, `dict/baopaau-rime.json` 
+- have shape
+  `{ "<traditional char>": { "r": ["reading", ...], "d": 1 } }`. 
+- `r` is
+  most-reliable / most-common first (index 0 is the app default).
+- `d` is present
+  only when the reading is *derived* (auto-generated, unverified — `baopaau-rime`
+  only).
+
+`datasets.json`
+- the manifest the app reads (ids, labels, character counts,
+  default).
+
+Regenerate after editing a source:
 
 ```bash
-python utils/transcription_to_json.py
+python utils/build_datasets.py
 ```
+
+Non-syllable readings with no vowel nucleus (`j` for 著, `zh` for 是, `z` for 子,
+`r` for 兒 — upstream truncation artifacts) are dropped by the builder; `y` counts
+as a vowel (it spells the apical vowel, e.g. 值 `dhyc`).
 
 ## Done
 
@@ -22,6 +52,8 @@ python utils/transcription_to_json.py
       (Traditional / Simplified / Japanese) plus manual override chips; Tungdzih
       output beside it.
 - [x] Saved translations persist in `localStorage`.
+- [x] Selectable dictionary (`zime` / `baopaau-rime`), with auto-derived readings
+      in the fuller set marked in the output.
 
 ## Known limitations
 

@@ -1,17 +1,23 @@
 // Render a token list (from translate.js) into the output panel.
 //
-// Two display modes:
-//   inline  = false  -> polyphones show their selected reading with a dotted
-//                       underline; hover/focus reveals a tooltip whose buttons
-//                       switch that word's reading.
-//   inline  = true   -> polyphones render as "reading1/reading2", no interaction.
+// Display modes:
+//   inline = false -> polyphones show their selected reading with a dotted
+//                     underline; hover/focus reveals a tooltip whose buttons
+//                     switch that word's reading.
+//   inline = true  -> polyphones render as "reading1/reading2", no interaction.
+//
+// A syllable whose reading is auto-derived / unverified (token.derived) gets a
+// wavy underline and a short tooltip note, in either mode.
 //
 // `overrides` is a Map<tokenIndex, readingIndex>; `onOverrideChange(map)` is
-// called after the user picks a reading so the caller can re-render / re-sync.
+// called after the user picks a reading so the caller can re-render.
+//
+// Returns { derived: <count of derived syllables rendered> }.
 
 import { NO_SPACE_BEFORE, NO_SPACE_AFTER } from './translate.js';
 
 const CJK = /\p{Script=Han}/u;
+const DERIVED_NOTE = 'Auto-derived reading — not hand-verified.';
 
 export function renderOutput(container, tokens, opts = {}) {
   const { inline = false, overrides = new Map(), onOverrideChange } = opts;
@@ -20,19 +26,15 @@ export function renderOutput(container, tokens, opts = {}) {
   if (!tokens.length) {
     container.classList.add('is-empty');
     container.textContent = 'Tungdzih output will appear here.';
-    return;
+    return { derived: 0 };
   }
   container.classList.remove('is-empty');
 
   let pendingSpace = false;
   let hasContent = false;
+  let derivedCount = 0;
 
-  const addText = (text) => {
-    container.appendChild(document.createTextNode(text));
-  };
-  const spaceBefore = () => {
-    if (hasContent && pendingSpace) addText(' ');
-  };
+  const addText = (text) => container.appendChild(document.createTextNode(text));
 
   tokens.forEach((token, i) => {
     if (token.type === 'raw') {
@@ -45,34 +47,66 @@ export function renderOutput(container, tokens, opts = {}) {
     }
 
     // syllable
-    const readings = token.readings;
-    spaceBefore();
+    const { readings, derived } = token;
+    if (hasContent && pendingSpace) addText(' ');
+    if (derived) derivedCount += 1;
 
-    if (readings.length === 1) {
-      addText(readings[0]);
-    } else if (inline) {
-      addText(readings.join('/'));
+    const multi = readings.length > 1;
+    if (multi && !inline) {
+      container.appendChild(buildPolyphone(token, i, overrides, onOverrideChange));
+    } else if (multi) {
+      container.appendChild(
+        derived
+          ? wrapDerived(readings.join('/'))
+          : document.createTextNode(readings.join('/'))
+      );
     } else {
       container.appendChild(
-        buildPolyphone(token, i, overrides, onOverrideChange)
+        derived ? wrapDerived(readings[0]) : document.createTextNode(readings[0])
       );
     }
+
     pendingSpace = true;
     hasContent = true;
   });
+
+  return { derived: derivedCount };
+}
+
+function tooltip(lines) {
+  const tip = document.createElement('span');
+  tip.className = 'poly-tip';
+  tip.setAttribute('aria-hidden', 'true');
+  for (const text of lines) {
+    const row = document.createElement('span');
+    row.className = 'poly-tip-head';
+    row.textContent = text;
+    tip.appendChild(row);
+  }
+  return tip;
+}
+
+function wrapDerived(text) {
+  const span = document.createElement('span');
+  span.className = 'derived';
+  span.tabIndex = 0;
+  span.setAttribute('aria-label', `${text}. ${DERIVED_NOTE}`);
+  span.append(document.createTextNode(text), tooltip([DERIVED_NOTE]));
+  return span;
 }
 
 function buildPolyphone(token, tokenIndex, overrides, onOverrideChange) {
   const selected = overrides.get(tokenIndex) ?? 0;
 
   const wrap = document.createElement('span');
-  wrap.className = 'poly';
+  wrap.className = token.derived ? 'poly derived' : 'poly';
   wrap.tabIndex = 0;
   wrap.setAttribute('role', 'button');
   wrap.setAttribute('aria-haspopup', 'true');
   wrap.setAttribute(
     'aria-label',
-    `${token.source}: ${token.readings[selected]}. ${token.readings.length} readings available`
+    `${token.source}: ${token.readings[selected]}. ${token.readings.length} readings` +
+      (token.derived ? `. ${DERIVED_NOTE}` : '')
   );
 
   const label = document.createElement('span');
@@ -109,6 +143,13 @@ function buildPolyphone(token, tokenIndex, overrides, onOverrideChange) {
     });
     tip.appendChild(opt);
   });
+
+  if (token.derived) {
+    const note = document.createElement('span');
+    note.className = 'poly-tip-note';
+    note.textContent = DERIVED_NOTE;
+    tip.appendChild(note);
+  }
 
   wrap.appendChild(tip);
 

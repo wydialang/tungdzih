@@ -1,0 +1,22 @@
+{
+  "default": "baopaau-rime",
+  "datasets": [
+    {
+      "id": "zime",
+      "label": "zime",
+      "file": "dict/zime.json",
+      "source": "https://github.com/lotem/zime",
+      "description": "RIME/zime input-method keyword list — roughly one representative character per syllable.",
+      "characters": 3483
+    },
+    {
+      "id": "baopaau-rime",
+      "label": "baopaau-rime",
+      "file": "dict/baopaau-rime.json",
+      "source": "https://github.com/baopaau/rime-tungdzih",
+      "description": "Fuller General Chinese dictionary. ~17k of its characters are auto-derived from Middle Chinese and unverified (shown marked).",
+      "hasDerived": true,
+      "characters": 21269
+    }
+  ]
+}

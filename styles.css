@@ -10,6 +10,7 @@
   --accent-contrast: #ffffff;
   --accent-soft: #e7efff;
   --danger: #d64545;
+  --warn: #b7791f;
   --radius: 12px;
   --radius-sm: 8px;
   --shadow: 0 1px 2px rgba(15, 23, 42, 0.06), 0 8px 24px rgba(15, 23, 42, 0.06);
@@ -33,7 +34,20 @@
   --accent-contrast: #0b1220;
   --accent-soft: #1c2740;
   --danger: #f2777a;
+  --warn: #e0a458;
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 * { box-sizing: border-box; }
@@ -113,6 +127,7 @@ body {
   margin-top: 24px;
   display: grid;
   grid-template-columns: 1fr 1fr;
+  align-items: start;
   gap: 16px;
 }
 
@@ -123,30 +138,29 @@ body {
   box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
-  min-height: 260px;
 }
 
 .pane-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 10px 12px;
+  gap: 8px 12px;
+  padding: 9px 12px;
   border-bottom: 1px solid var(--border);
   background: var(--surface-2);
   border-radius: var(--radius) var(--radius) 0 0;
-  min-height: 48px;
+  min-height: 46px;
   flex-wrap: wrap;
 }
 
 /* ---------- chips ---------- */
 
-.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chips { display: flex; gap: 5px; flex-wrap: wrap; }
 
 .chip {
   font: inherit;
-  font-size: 0.82rem;
-  padding: 4px 10px;
+  font-size: 0.8rem;
+  padding: 4px 9px;
   border-radius: 999px;
   border: 1px solid var(--border);
   background: var(--surface);
@@ -166,16 +180,39 @@ body {
   background: var(--accent-soft);
 }
 
+.head-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.head-group.actions { justify-content: flex-end; }
+
 .detected {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   color: var(--text-dim);
   white-space: nowrap;
 }
 
+.dataset-select {
+  font: inherit;
+  font-size: 0.78rem;
+  padding: 3px 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  max-width: 100%;
+}
+.dataset-select:disabled { opacity: 0.6; cursor: default; }
+.dataset-select:hover { border-color: var(--accent); }
+.dataset-select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
 /* ---------- input ---------- */
 
 .input {
-  flex: 1;
+  flex: 0 0 auto;
   border: 0;
   resize: vertical;
   padding: 16px;
@@ -184,7 +221,8 @@ body {
   line-height: 1.6;
   background: transparent;
   color: var(--text);
-  min-height: 160px;
+  height: 230px;
+  min-height: 120px;
 }
 .input:focus { outline: none; }
 .input::placeholder { color: var(--text-dim); opacity: 0.7; }
@@ -193,17 +231,33 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
   padding: 8px 12px;
   border-top: 1px solid var(--border);
   border-radius: 0 0 var(--radius) var(--radius);
   font-size: 0.8rem;
   color: var(--text-dim);
 }
+.foot-left {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  overflow: hidden;
+}
+.foot-left .detected {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.foot-left .detected:not(:empty)::before {
+  content: "·\00a0";
+  color: var(--border);
+}
 
 /* ---------- output ---------- */
 
 .output {
-  flex: 1;
+  flex: 1 1 auto;
   padding: 16px;
   font-family: var(--mono);
   font-size: 1.05rem;
@@ -211,23 +265,36 @@ body {
   white-space: pre-wrap;
   word-break: break-word;
   overflow-wrap: anywhere;
+  min-height: 230px;
 }
 .output.is-empty { color: var(--text-dim); font-family: var(--serif); }
 
 .hint {
   margin: 0;
   padding: 8px 12px;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 12px;
   border-top: 1px solid var(--border);
   border-radius: 0 0 var(--radius) var(--radius);
   font-size: 0.78rem;
   color: var(--text-dim);
 }
+.hint .switch { flex: none; }
+.hint-note { flex: 1 1 auto; min-width: 12ch; }
 .hint-poly {
   text-decoration: underline dotted;
   text-underline-offset: 3px;
 }
+.hint-derived {
+  text-decoration: underline wavy;
+  text-decoration-color: var(--warn);
+  text-underline-offset: 3px;
+}
+.derived-legend { color: var(--text-dim); }
 
-/* ---------- polyphone tooltip ---------- */
+/* ---------- polyphone tooltip / derived marker ---------- */
 
 .poly {
   position: relative;
@@ -241,6 +308,23 @@ body {
 .poly:focus-visible {
   background: var(--accent-soft);
   outline: none;
+}
+
+/* Single-reading syllable whose reading is auto-derived / unverified. */
+.derived {
+  position: relative;
+  text-decoration: underline wavy;
+  text-decoration-color: var(--warn);
+  text-underline-offset: 3px;
+  cursor: help;
+  border-radius: 3px;
+}
+.derived:focus-visible { outline: none; background: var(--surface-2); }
+
+/* Polyphone that is also derived: keep the dotted picker underline but recolour. */
+.poly.derived {
+  text-decoration-style: dotted;
+  text-decoration-color: var(--warn);
 }
 
 .poly-tip {
@@ -264,7 +348,10 @@ body {
 }
 .poly:hover .poly-tip,
 .poly:focus-within .poly-tip,
-.poly:focus-visible .poly-tip {
+.poly:focus-visible .poly-tip,
+.derived:hover .poly-tip,
+.derived:focus-within .poly-tip,
+.derived:focus-visible .poly-tip {
   opacity: 1;
   visibility: visible;
   transform: translateX(-50%) translateY(0);
@@ -287,6 +374,26 @@ body {
   color: var(--text-dim);
   padding: 2px 6px 4px;
 }
+/* The derived tooltip reuses .poly-tip-head for its one line; that line is a
+   sentence, so opt back out of the uppercase treatment when it stands alone. */
+.derived .poly-tip { width: 168px; }
+.derived .poly-tip .poly-tip-head {
+  text-transform: none;
+  letter-spacing: 0;
+  font-style: italic;
+  white-space: normal;
+}
+.poly-tip-note {
+  font-family: var(--serif);
+  font-size: 0.68rem;
+  font-style: italic;
+  color: var(--text-dim);
+  white-space: normal;
+  margin-top: 2px;
+  padding: 4px 6px 2px;
+  border-top: 1px solid var(--border);
+}
+.poly.derived .poly-tip { width: 150px; }
 
 .poly-opt {
   font: inherit;
@@ -311,20 +418,19 @@ body {
 .switch {
   display: flex;
   align-items: center;
-  gap: 7px;
-  font-size: 0.82rem;
+  gap: 6px;
+  font-size: 0.78rem;
   color: var(--text-dim);
   cursor: pointer;
   user-select: none;
+  white-space: nowrap;
 }
 .switch input { accent-color: var(--accent); }
 
-.actions { display: flex; gap: 8px; }
-
 .btn {
   font: inherit;
-  font-size: 0.85rem;
-  padding: 6px 14px;
+  font-size: 0.8rem;
+  padding: 5px 11px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border);
   background: var(--surface);

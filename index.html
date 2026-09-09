@@ -54,7 +54,6 @@
         <section class="pane pane-input">
           <div class="pane-head">
             <div id="chips" class="chips" role="group" aria-label="Input script"></div>
-            <span id="detected" class="detected" aria-live="polite"></span>
           </div>
           <textarea
             id="input"
@@ -64,18 +63,21 @@
             placeholder="輸入漢字 / 输入汉字 / 漢字を入力"
           ></textarea>
           <div class="pane-foot">
-            <span id="count" class="count">0 chars</span>
+            <span class="foot-left">
+              <span id="count" class="count">0 chars</span>
+              <span id="detected" class="detected" aria-live="polite"></span>
+            </span>
             <button type="button" id="clear-input" class="link-btn">Clear</button>
           </div>
         </section>
 
         <section class="pane pane-output">
           <div class="pane-head">
-            <label class="switch">
-              <input type="checkbox" id="inline-toggle" />
-              <span>Show all readings inline</span>
-            </label>
-            <div class="actions">
+            <div class="head-group">
+              <label class="sr-only" for="dataset">Dictionary</label>
+              <select id="dataset" class="dataset-select" aria-label="Dictionary"></select>
+            </div>
+            <div class="head-group actions">
               <button type="button" id="copy" class="btn">Copy</button>
               <button type="button" id="save" class="btn btn-primary">Save</button>
             </div>
@@ -83,10 +85,18 @@
           <div id="output" class="output is-empty" aria-live="polite">
             Tungdzih output will appear here.
           </div>
-          <p class="hint">
-            Polyphonic characters are <span class="hint-poly">underlined</span> &mdash;
-            hover or focus to pick a different reading.
-          </p>
+          <div class="hint">
+            <label class="switch">
+              <input type="checkbox" id="inline-toggle" />
+              <span>All readings inline</span>
+            </label>
+            <span class="hint-note">
+              <span class="hint-poly">Underlined</span> &mdash; other readings on hover.
+              <span id="derived-legend" class="derived-legend" hidden>
+                <span class="hint-derived">Wavy</span> &mdash; auto-derived, unverified.
+              </span>
+            </span>
+          </div>
         </section>
       </div>
 
@@ -102,9 +112,14 @@
 
     <footer class="site-foot">
       <p>
-        One-directional (characters &rarr; Tungdzih). Script conversion uses
-        <a href="https://github.com/nk2028/opencc-js" rel="noopener">opencc-js</a>;
-        readings follow Y.&nbsp;R.&nbsp;Chao&rsquo;s General Chinese.
+        One-directional (characters &rarr; Tungdzih). <br>
+        Dictionary sources:
+        <a href="https://github.com/lotem/zime" rel="noopener">lotem/zime</a> and
+        <a href="https://github.com/baopaau/rime-tungdzih" rel="noopener">baopaau/rime-tungdzih</a>.
+        Readings follow Y.&nbsp;R.&nbsp;Chao&rsquo;s General Chinese &mdash; baopaau&rsquo;s
+        fuller set is partly auto-derived from Middle Chinese and unverified. <br>
+        Script conversion uses
+        <a href="https://github.com/nk2028/opencc-js" rel="noopener">opencc-js</a>.
       </p>
     </footer>
   </div>

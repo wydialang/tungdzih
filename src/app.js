@@ -2,6 +2,7 @@ import { whenReady } from './opencc.js';
 import { MODE_LABELS } from './detect.js';
 import { translate, tokensToText } from './translate.js';
 import { renderOutput } from './render.js';
+import * as datasets from './datasets.js';
 import * as store from './storage.js';
 
 const PREF_KEY = 'tungdzih.prefs';
@@ -14,6 +15,7 @@ const els = {
   translator: document.getElementById('translator'),
   chips: document.getElementById('chips'),
   detected: document.getElementById('detected'),
+  dataset: document.getElementById('dataset'),
   input: document.getElementById('input'),
   count: document.getElementById('count'),
   clearInput: document.getElementById('clear-input'),
@@ -21,6 +23,7 @@ const els = {
   copy: document.getElementById('copy'),
   save: document.getElementById('save'),
   output: document.getElementById('output'),
+  derivedLegend: document.getElementById('derived-legend'),
   savedList: document.getElementById('saved-list'),
   savedEmpty: document.getElementById('saved-empty'),
   clearAll: document.getElementById('clear-all'),
@@ -28,20 +31,24 @@ const els = {
 
 const state = {
   table: null,
+  datasetId: null,
   requestedMode: 'auto',
   inline: false,
   overrides: new Map(),
+  input: '',
   last: null, // { tokens, resolvedMode, detection }
 };
 
 /* ---------- preferences ---------- */
 
-// Only the inline-readings toggle is remembered. The script mode always starts
-// on "Auto" so stale detection overrides never silently follow you around.
+// The dictionary choice and the inline-readings toggle are remembered. The
+// script mode always starts on "Auto" so stale detection overrides never
+// silently follow you around.
 function loadPrefs() {
   try {
     const p = JSON.parse(localStorage.getItem(PREF_KEY) || '{}');
     if (typeof p.inline === 'boolean') state.inline = p.inline;
+    if (typeof p.datasetId === 'string') state.datasetId = p.datasetId;
   } catch {
     /* ignore */
   }
@@ -49,7 +56,10 @@ function loadPrefs() {
 
 function savePrefs() {
   try {
-    localStorage.setItem(PREF_KEY, JSON.stringify({ inline: state.inline }));
+    localStorage.setItem(
+      PREF_KEY,
+      JSON.stringify({ inline: state.inline, datasetId: state.datasetId })
+    );
   } catch {
     /* ignore */
   }
@@ -87,6 +97,56 @@ function initTheme() {
   });
 }
 
+/* ---------- dataset picker ---------- */
+
+function buildDatasetSelect() {
+  const manifest = datasets.getManifest();
+  els.dataset.textContent = '';
+  for (const d of manifest.datasets) {
+    const opt = document.createElement('option');
+    opt.value = d.id;
+    opt.textContent = `${d.label} · ${d.characters.toLocaleString('en-US')}`;
+    opt.title = `${d.description} (${d.characters.toLocaleString('en-US')} characters)`;
+    els.dataset.appendChild(opt);
+  }
+  if (!datasets.isValidId(state.datasetId)) state.datasetId = manifest.default;
+  els.dataset.value = state.datasetId;
+
+  els.dataset.addEventListener('change', () => selectDataset(els.dataset.value));
+}
+
+// Switch the active dictionary. On failure, roll the picker back to whatever was
+// working rather than leaving the app wedged.
+async function selectDataset(id) {
+  const previous = state.datasetId;
+  if (id === previous && state.table) return;
+
+  els.dataset.value = id;
+  els.dataset.disabled = true;
+  if (!datasets.isLoaded(id)) {
+    els.output.classList.add('is-empty');
+    els.output.textContent = 'Loading dictionary…';
+  }
+
+  try {
+    state.table = await datasets.loadTable(id);
+    state.datasetId = id;
+    savePrefs();
+    run();
+  } catch (err) {
+    console.error(err);
+    els.dataset.value = previous;
+    els.output.classList.add('is-empty');
+    els.output.textContent =
+      `Couldn't load dictionary. `;
+    setTimeout(() => {
+      if (state.last && state.datasetId === previous) run();
+    }, 3000);
+  } finally {
+    els.dataset.disabled = false;
+  }
+}
+
 /* ---------- chips ---------- */
 
 function buildChips() {
@@ -99,7 +159,6 @@ function buildChips() {
     btn.textContent = MODE_LABELS[mode];
     btn.addEventListener('click', () => {
       state.requestedMode = mode;
-      savePrefs();
       run();
     });
     els.chips.appendChild(btn);
@@ -118,17 +177,20 @@ function syncChips() {
     );
   });
 
-  if (!state.last || !state.input?.length) {
+  const d = state.last?.detection;
+  const c = d?.counts;
+  const hanCount = c ? c.simp + c.trad + c.jp + c.neutral : 0;
+  if (!state.last || hanCount === 0) {
+    // Nothing Chinese/Japanese typed yet — a script label would be noise.
     els.detected.textContent = '';
     return;
   }
   const resolved = state.last.resolvedMode;
   if (auto) {
-    els.detected.textContent = state.last.detection.confident
+    els.detected.textContent = d.confident
       ? `Detected: ${MODE_LABELS[resolved]}`
       : `Assuming: ${MODE_LABELS[resolved]}`;
   } else {
-    const d = state.last.detection;
     els.detected.textContent =
       d.confident && d.mode !== resolved
         ? `Forced ${MODE_LABELS[resolved]} · looks like ${MODE_LABELS[d.mode]}`
@@ -151,21 +213,18 @@ function run() {
 
   state.overrides = new Map();
   state.last = translate(text, state.table, state.requestedMode);
-
-  renderOutput(els.output, state.last.tokens, {
-    inline: state.inline,
-    overrides: state.overrides,
-    onOverrideChange: rerender,
-  });
+  rerender();
   syncChips();
 }
 
 function rerender() {
-  renderOutput(els.output, state.last.tokens, {
+  const { derived } = renderOutput(els.output, state.last.tokens, {
     inline: state.inline,
     overrides: state.overrides,
     onOverrideChange: rerender,
   });
+  const hasDerived = !!datasets.entry(state.datasetId)?.hasDerived;
+  els.derivedLegend.hidden = !(hasDerived && derived > 0);
 }
 
 function currentOutputText() {
@@ -198,17 +257,12 @@ function renderSaved(list) {
     out.textContent = item.output;
     const meta = document.createElement('span');
     meta.className = 'saved-meta';
-    meta.textContent = MODE_LABELS[item.mode] || item.mode;
+    const dsLabel = datasets.entry(item.dataset)?.label;
+    meta.textContent = [MODE_LABELS[item.mode] || item.mode, dsLabel]
+      .filter(Boolean)
+      .join(' · ');
     main.append(src, out, meta);
-    main.addEventListener('click', () => {
-      els.input.value = item.input;
-      if (MODES.includes(item.mode)) {
-        state.requestedMode = item.mode;
-        savePrefs();
-      }
-      run();
-      els.input.focus();
-    });
+    main.addEventListener('click', () => loadSaved(item));
 
     const del = document.createElement('button');
     del.type = 'button';
@@ -220,6 +274,17 @@ function renderSaved(list) {
     li.append(main, del);
     els.savedList.appendChild(li);
   });
+}
+
+async function loadSaved(item) {
+  els.input.value = item.input;
+  if (MODES.includes(item.mode)) state.requestedMode = item.mode;
+  if (datasets.isValidId(item.dataset) && item.dataset !== state.datasetId) {
+    await selectDataset(item.dataset); // runs the translation itself
+  } else {
+    run();
+  }
+  els.input.focus();
 }
 
 /* ---------- wiring ---------- */
@@ -253,7 +318,14 @@ function bind() {
     const input = els.input.value.trim();
     const output = currentOutputText();
     if (!input || !output) return;
-    renderSaved(store.save({ input, output, mode: state.last.resolvedMode }));
+    renderSaved(
+      store.save({
+        input,
+        output,
+        mode: state.last.resolvedMode,
+        dataset: state.datasetId,
+      })
+    );
     flash(els.save, 'Saved');
   });
 
@@ -278,18 +350,12 @@ function flash(btn, msg) {
 async function boot() {
   initTheme();
   loadPrefs();
-  buildChips();
   els.inlineToggle.checked = state.inline;
 
   try {
-    const [tableRes] = await Promise.all([
-      fetch('data/transcription.json').then((r) => {
-        if (!r.ok) throw new Error(`transcription.json: HTTP ${r.status}`);
-        return r.json();
-      }),
-      whenReady(),
-    ]);
-    state.table = tableRes;
+    await Promise.all([whenReady(), datasets.loadManifest()]);
+    buildDatasetSelect();
+    state.table = await datasets.loadTable(state.datasetId);
   } catch (err) {
     console.error(err);
     els.status.textContent =
@@ -300,6 +366,7 @@ async function boot() {
 
   els.status.hidden = true;
   els.translator.hidden = false;
+  buildChips();
   bind();
   renderSaved(store.load());
   run();

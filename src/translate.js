@@ -1,11 +1,14 @@
 // Character -> Tungdzih translation.
 //
-// The reading table (data/transcription.json) is keyed purely by single
+// The reading table (data/dict/<id>.json) is keyed purely by single
 // OpenCC-standard Traditional characters, so non-Traditional input is first
 // normalized one character at a time. Per-character (rather than phrase-level)
 // conversion keeps the output aligned 1:1 with the input; the trade-off is that
 // context-sensitive variant choices (e.g. 后 vs 後) are not made. See
 // data/README.md.
+//
+// Table entries have the shape { r: ["reading", ...], d?: 1 } — `d` marks a
+// reading that is auto-derived / unverified (baopaau-rime only).
 
 import { getConverters } from './opencc.js';
 import { detectScript } from './detect.js';
@@ -21,7 +24,7 @@ function normalizeChar(ch, mode, conv) {
 
 /**
  * @param {string} text          raw user input
- * @param {object} table         { char: [reading, ...] }
+ * @param {object} table         { char: { r: [reading, ...], d?: 1 } }
  * @param {string} requestedMode 'auto' | 't' | 'cn' | 'jp'
  * @returns {{ tokens: Array, resolvedMode: string, detection: object }}
  */
@@ -42,14 +45,15 @@ export function translate(text, table, requestedMode = 'auto') {
 
   for (const ch of text) {
     const normalized = normalizeChar(ch, resolvedMode, conv);
-    const readings = CJK.test(normalized) ? table[normalized] : undefined;
-    if (readings && readings.length) {
+    const hit = CJK.test(normalized) ? table[normalized] : undefined;
+    if (hit && hit.r && hit.r.length) {
       flushRaw();
       tokens.push({
         type: 'syllable',
         source: ch,
         normalized,
-        readings,
+        readings: hit.r,
+        derived: !!hit.d,
       });
     } else {
       rawBuffer += ch;

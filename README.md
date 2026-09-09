@@ -7,7 +7,11 @@ the major Sinitic varieties. You can read more about General Chinese here:
 * https://archive.org/details/a-project-for-general-chinese 
 
 
-The data used for the translator can be found here: https://raw.githubusercontent.com/lotem/zime/master/zime-data/tungdzih/tungdzih-keywords.txt
+Reading data comes from two vendored sources, selectable in the app:
+[`lotem/zime`](https://github.com/lotem/zime) and
+[`baopaau/rime-tungdzih`](https://github.com/baopaau/rime-tungdzih) (a much fuller
+dictionary, partly auto-derived from Middle Chinese and unverified). See
+[data/README.md](data/README.md).
 
 Obligatory [xkcd comic](https://xkcd.com/927/)
 
@@ -20,6 +24,8 @@ Obligatory [xkcd comic](https://xkcd.com/927/)
   with the Auto / Traditional / Simplified / Japanese chips.
 - **Polyphonic characters** are underlined; hover, tap, or focus to see every reading
   and pick one. Readings can also be shown inline.
+- **Selectable dictionary** (`zime` / `baopaau-rime`); auto-derived, unverified
+  readings in the fuller set are marked with a wavy underline.
 - Untranslatable text (punctuation, Latin, digits) is passed through
 - **Save translations** — kept in `localStorage`
 
@@ -47,6 +53,8 @@ Then visit http://localhost:8000.
 | `src/detect.js` | script detection (Traditional / Simplified / Japanese) |
 | `src/translate.js` | normalize → per-character lookup → token list |
 | `src/render.js` | token list → output DOM (underline / tooltip / inline) |
+| `src/datasets.js` | dictionary manifest + lazy table loading |
 | `src/opencc.js` | wraps the `opencc-js` UMD bundle |
 | `src/storage.js` | `localStorage`-backed saved translations |
-| `data/` | reading table + how to regenerate it |
+| `utils/build_datasets.py` | regenerates `data/dict/*.json` + `data/datasets.json` |
+| `data/` | vendored sources, generated tables, how to regenerate |
