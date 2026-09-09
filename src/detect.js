@@ -1,7 +1,7 @@
 // Guess whether a chunk of text is Traditional Chinese, Simplified Chinese, or
 // Japanese (Shinjitai), by asking OpenCC to round-trip each character.
 //
-// For a CJK ideograph `c`:
+// For a CJK character `c`:
 //   * if converting Simplified->Traditional changes it (and Traditional->
 //     Simplified does not) then `c` only exists on the Simplified side  -> simp
 //   * if converting Traditional->Simplified changes it (and the reverse does

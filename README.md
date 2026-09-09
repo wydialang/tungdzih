@@ -1,10 +1,17 @@
 # Tungdzih Translator
 
-A static web app that converts Chinese characters into **Tungdzih** (通字), Y. R. Chao's
-*General Chinese* romanization — a diaphonemic system that encodes pronunciations across
-the major Chinese varieties.
+A static web app that converts Chinese characters into **Tungdzih Lomaadzih** (通字羅馬字), Y. R. Chao's
+*General Chinese* romanization-- a diaphonemic system that encodes pronunciations across
+the major Sinitic varieties. You can read more about General Chinese here: 
+* https://en.wikipedia.org/wiki/General_Chinese
+* https://archive.org/details/a-project-for-general-chinese 
 
-Try the WIP build: https://ephemeral-sunburst-760198.netlify.app/
+
+The data used for the translator can be found here: https://raw.githubusercontent.com/lotem/zime/master/zime-data/tungdzih/tungdzih-keywords.txt
+
+Obligatory [xkcd comic](https://xkcd.com/927/)
+
+<!-- Try the WIP build: https://ephemeral-sunburst-760198.netlify.app/ -->
 
 ## Features
 
