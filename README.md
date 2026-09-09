@@ -25,6 +25,9 @@ Obligatory [xkcd comic](https://xkcd.com/927/)
 
 - Translation is currently one-directional (characters → Tungdzih).
 
+## TODOs
+Check [data/README.md](data/README.md) for a list of features that need to be added.
+
 ## Develop
 
 Open the folder:
