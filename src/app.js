@@ -23,6 +23,8 @@ const els = {
   copy: document.getElementById('copy'),
   save: document.getElementById('save'),
   output: document.getElementById('output'),
+  hintNote: document.getElementById('hint-note'),
+  polyLegend: document.getElementById('poly-legend'),
   derivedLegend: document.getElementById('derived-legend'),
   savedList: document.getElementById('saved-list'),
   savedEmpty: document.getElementById('saved-empty'),
@@ -218,13 +220,18 @@ function run() {
 }
 
 function rerender() {
-  const { derived } = renderOutput(els.output, state.last.tokens, {
+  const { derived, poly } = renderOutput(els.output, state.last.tokens, {
     inline: state.inline,
     overrides: state.overrides,
     onOverrideChange: rerender,
   });
-  const hasDerived = !!datasets.entry(state.datasetId)?.hasDerived;
-  els.derivedLegend.hidden = !(hasDerived && derived > 0);
+  // Each legend line shows only when the thing it explains is on screen.
+  const showPoly = poly > 0;
+  const showDerived =
+    derived > 0 && !!datasets.entry(state.datasetId)?.hasDerived;
+  els.polyLegend.hidden = !showPoly;
+  els.derivedLegend.hidden = !showDerived;
+  els.hintNote.hidden = !(showPoly || showDerived);
 }
 
 function currentOutputText() {

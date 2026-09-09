@@ -194,6 +194,12 @@ body {
   white-space: nowrap;
 }
 
+.dataset-label {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
 .dataset-select {
   font: inherit;
   font-size: 0.78rem;
@@ -283,6 +289,7 @@ body {
 }
 .hint .switch { flex: none; }
 .hint-note { flex: 1 1 auto; min-width: 12ch; }
+.hint-note #derived-legend:not([hidden]) { margin-left: 4px; }
 .hint-poly {
   text-decoration: underline dotted;
   text-underline-offset: 3px;
@@ -292,7 +299,6 @@ body {
   text-decoration-color: var(--warn);
   text-underline-offset: 3px;
 }
-.derived-legend { color: var(--text-dim); }
 
 /* ---------- polyphone tooltip / derived marker ---------- */
 

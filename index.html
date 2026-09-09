@@ -74,8 +74,8 @@
         <section class="pane pane-output">
           <div class="pane-head">
             <div class="head-group">
-              <label class="sr-only" for="dataset">Dictionary</label>
-              <select id="dataset" class="dataset-select" aria-label="Dictionary"></select>
+              <label class="dataset-label" for="dataset">Select dictionary:</label>
+              <select id="dataset" class="dataset-select"></select>
             </div>
             <div class="head-group actions">
               <button type="button" id="copy" class="btn">Copy</button>
@@ -90,9 +90,11 @@
               <input type="checkbox" id="inline-toggle" />
               <span>All readings inline</span>
             </label>
-            <span class="hint-note">
-              <span class="hint-poly">Underlined</span> &mdash; other readings on hover.
-              <span id="derived-legend" class="derived-legend" hidden>
+            <span class="hint-note" id="hint-note" hidden>
+              <span id="poly-legend">
+                <span class="hint-poly">Underlined</span> &mdash; other readings on hover.
+              </span>
+              <span id="derived-legend" hidden>
                 <span class="hint-derived">Wavy</span> &mdash; auto-derived, unverified.
               </span>
             </span>

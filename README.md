@@ -9,8 +9,7 @@ the major Sinitic varieties. You can read more about General Chinese here:
 
 Reading data comes from two vendored sources, selectable in the app:
 [`lotem/zime`](https://github.com/lotem/zime) and
-[`baopaau/rime-tungdzih`](https://github.com/baopaau/rime-tungdzih) (a much fuller
-dictionary, partly auto-derived from Middle Chinese and unverified). See
+[`baopaau/rime-tungdzih`](https://github.com/baopaau/rime-tungdzih). See
 [data/README.md](data/README.md).
 
 Obligatory [xkcd comic](https://xkcd.com/927/)

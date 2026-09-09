@@ -26,13 +26,14 @@ export function renderOutput(container, tokens, opts = {}) {
   if (!tokens.length) {
     container.classList.add('is-empty');
     container.textContent = 'Tungdzih output will appear here.';
-    return { derived: 0 };
+    return { derived: 0, poly: 0 };
   }
   container.classList.remove('is-empty');
 
   let pendingSpace = false;
   let hasContent = false;
   let derivedCount = 0;
+  let polyCount = 0; // interactive polyphones actually rendered (multi + not inline)
 
   const addText = (text) => container.appendChild(document.createTextNode(text));
 
@@ -53,6 +54,7 @@ export function renderOutput(container, tokens, opts = {}) {
 
     const multi = readings.length > 1;
     if (multi && !inline) {
+      polyCount += 1;
       container.appendChild(buildPolyphone(token, i, overrides, onOverrideChange));
     } else if (multi) {
       container.appendChild(
@@ -70,7 +72,7 @@ export function renderOutput(container, tokens, opts = {}) {
     hasContent = true;
   });
 
-  return { derived: derivedCount };
+  return { derived: derivedCount, poly: polyCount };
 }
 
 function tooltip(lines) {
