@@ -281,14 +281,15 @@ body {
   display: flex;
   align-items: baseline;
   flex-wrap: wrap;
-  gap: 4px 12px;
+  gap: 6px 12px;
   border-top: 1px solid var(--border);
   border-radius: 0 0 var(--radius) var(--radius);
   font-size: 0.78rem;
   color: var(--text-dim);
 }
 .hint .switch { flex: none; }
-.hint-note { flex: 1 1 auto; min-width: 12ch; }
+/* Always drop the legend onto its own line under the checkbox. */
+.hint-note { flex: 1 1 100%; }
 .hint-note #derived-legend:not([hidden]) { margin-left: 4px; }
 .hint-poly {
   text-decoration: underline dotted;

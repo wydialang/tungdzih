@@ -1,6 +1,6 @@
 # [Tungdzih Translator](https://tungdzih.wydialang.com)
 
-A static web app that converts Chinese characters into **Tungdzih Lomaadzih** (通字羅馬字), Y. R. Chao's
+A static web app that converts Chinese characters into **Tung-dzih Lo-maa-dzih** (通字羅馬字), Y. R. Chao's
 *General Chinese* romanization-- a diaphonemic system that encodes pronunciations across
 the major Sinitic varieties. You can read more about General Chinese here: 
 * https://en.wikipedia.org/wiki/General_Chinese
