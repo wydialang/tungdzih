@@ -530,10 +530,28 @@ body {
 
 .site-foot {
   margin-top: 48px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px 24px;
+  flex-wrap: wrap;
   color: var(--text-dim);
   font-size: 0.8rem;
 }
+.site-foot p { margin: 0; max-width: 62ch; }
 .site-foot a { color: var(--accent); }
+
+.site-foot .repo-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  text-decoration: none;
+  color: var(--text-dim);
+  transition: color 0.12s;
+}
+.site-foot .repo-link:hover { color: var(--text); }
+.repo-link svg { flex: none; }
 
 /* ---------- responsive ---------- */
 
