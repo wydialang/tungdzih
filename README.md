@@ -1,4 +1,4 @@
-# Tungdzih Translator
+# [Tungdzih Translator](tungdzih.wydialang.com)
 
 A static web app that converts Chinese characters into **Tungdzih Lomaadzih** (通字羅馬字), Y. R. Chao's
 *General Chinese* romanization-- a diaphonemic system that encodes pronunciations across
