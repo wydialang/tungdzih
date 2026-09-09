@@ -5,9 +5,11 @@ import { renderOutput } from './render.js';
 import * as store from './storage.js';
 
 const PREF_KEY = 'tungdzih.prefs';
+const THEME_KEY = 'tungdzih.theme';
 const MODES = ['auto', 't', 'cn', 'jp'];
 
 const els = {
+  themeToggle: document.getElementById('theme-toggle'),
   status: document.getElementById('status'),
   translator: document.getElementById('translator'),
   chips: document.getElementById('chips'),
@@ -51,6 +53,38 @@ function savePrefs() {
   } catch {
     /* ignore */
   }
+}
+
+/* ---------- theme ---------- */
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  els.themeToggle.setAttribute(
+    'aria-label',
+    theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'
+  );
+}
+
+function initTheme() {
+  let theme = 'light';
+  try {
+    if (localStorage.getItem(THEME_KEY) === 'dark') theme = 'dark';
+  } catch {
+    /* ignore */
+  }
+  applyTheme(theme);
+  els.themeToggle.addEventListener('click', () => {
+    const next =
+      document.documentElement.getAttribute('data-theme') === 'dark'
+        ? 'light'
+        : 'dark';
+    applyTheme(next);
+    try {
+      localStorage.setItem(THEME_KEY, next);
+    } catch {
+      /* ignore */
+    }
+  });
 }
 
 /* ---------- chips ---------- */
@@ -242,6 +276,7 @@ function flash(btn, msg) {
 /* ---------- boot ---------- */
 
 async function boot() {
+  initTheme();
   loadPrefs();
   buildChips();
   els.inlineToggle.checked = state.inline;

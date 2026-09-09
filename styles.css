@@ -1,5 +1,5 @@
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
   --bg: #f6f7f9;
   --surface: #ffffff;
   --surface-2: #f0f2f5;
@@ -13,24 +13,27 @@
   --radius: 12px;
   --radius-sm: 8px;
   --shadow: 0 1px 2px rgba(15, 23, 42, 0.06), 0 8px 24px rgba(15, 23, 42, 0.06);
-  --mono: ui-monospace, "SF Mono", "JetBrains Mono", "Fira Code", Menlo, Consolas, monospace;
-  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --serif: "Source Serif 4", "Iowan Old Style", "Palatino Linotype", Palatino,
+    "Book Antiqua", Georgia, "Songti SC", "Noto Serif CJK SC", serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0f1115;
-    --surface: #181b21;
-    --surface-2: #1f232b;
-    --text: #e7e9ee;
-    --text-dim: #9aa3b2;
-    --border: #2c313b;
-    --accent: #5b8dff;
-    --accent-contrast: #0b1220;
-    --accent-soft: #1c2740;
-    --danger: #f2777a;
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 30px rgba(0, 0, 0, 0.35);
-  }
+/* Light is the default; dark is opt-in via the toggle (persisted to
+   localStorage and applied pre-paint by the inline script in index.html).
+   prefers-color-scheme is intentionally not consulted. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0f1115;
+  --surface: #181b21;
+  --surface-2: #1f232b;
+  --text: #e7e9ee;
+  --text-dim: #9aa3b2;
+  --border: #2c313b;
+  --accent: #5b8dff;
+  --accent-contrast: #0b1220;
+  --accent-soft: #1c2740;
+  --danger: #f2777a;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 30px rgba(0, 0, 0, 0.35);
 }
 
 * { box-sizing: border-box; }
@@ -39,7 +42,7 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: var(--sans);
+  font-family: var(--serif);
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
 }
@@ -52,11 +55,43 @@ body {
 
 /* ---------- header ---------- */
 
+.site-head-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
 .site-head h1 {
   margin: 0 0 6px;
   font-size: 1.7rem;
-  letter-spacing: -0.02em;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
+
+.theme-toggle {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: color 0.12s, border-color 0.12s, background 0.12s;
+}
+.theme-toggle:hover {
+  color: var(--text);
+  border-color: var(--accent);
+}
+.theme-toggle svg { width: 18px; height: 18px; }
+.theme-toggle .sun { display: none; }
+:root[data-theme="dark"] .theme-toggle .sun { display: block; }
+:root[data-theme="dark"] .theme-toggle .moon { display: none; }
 
 .tagline {
   margin: 0;
@@ -144,7 +179,7 @@ body {
   border: 0;
   resize: vertical;
   padding: 16px;
-  font-family: var(--sans);
+  font-family: var(--serif);
   font-size: 1.25rem;
   line-height: 1.6;
   background: transparent;
@@ -177,7 +212,7 @@ body {
   word-break: break-word;
   overflow-wrap: anywhere;
 }
-.output.is-empty { color: var(--text-dim); font-family: var(--sans); }
+.output.is-empty { color: var(--text-dim); font-family: var(--serif); }
 
 .hint {
   margin: 0;
@@ -245,7 +280,7 @@ body {
 }
 
 .poly-tip-head {
-  font-family: var(--sans);
+  font-family: var(--serif);
   font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;

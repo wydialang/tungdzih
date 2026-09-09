@@ -8,13 +8,38 @@
     name="description"
     content="Convert Chinese characters (Traditional, Simplified, or Japanese kanji) into Tungdzih, the General Chinese romanization."
   />
+  <script>
+    // Apply the saved theme before first paint. Light is the default.
+    try {
+      if (localStorage.getItem('tungdzih.theme') === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    } catch (e) {}
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap"
+  />
   <link rel="stylesheet" href="styles.css" />
   <script src="https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js"></script>
 </head>
 <body>
   <div class="wrap">
     <header class="site-head">
-      <h1>Tungdzih Translator</h1>
+      <div class="site-head-row">
+        <h1>Tungdzih Translator</h1>
+        <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Switch to dark theme">
+          <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+          </svg>
+          <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4" />
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+          </svg>
+        </button>
+      </div>
       <p class="tagline">
         Type Chinese characters &mdash; Traditional, Simplified, or Japanese kanji &mdash;
         and read them in Tungdzih, the <em>General Chinese</em> romanization that encodes

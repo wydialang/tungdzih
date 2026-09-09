@@ -27,7 +27,7 @@ Obligatory [xkcd comic](https://xkcd.com/927/)
 
 ## Develop
 
-No build step. Serve the folder and open it:
+Open the folder:
 
 ```bash
 python -m http.server 8000
