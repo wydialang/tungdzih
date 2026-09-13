@@ -1,4 +1,4 @@
-# Tungdzih translator — data & roadmap
+# Tungdzih translator: data & roadmap
 
 ## Dictionaries
 
@@ -11,9 +11,9 @@ vendored source by [`../utils/build_datasets.py`](../utils/build_datasets.py):
 | `baopaau-rime` | [`baopaau-rime.dict.yaml`](baopaau-rime.dict.yaml) <- `baopaau/rime-tungdzih`: `tungdzih.dict.yaml` | commit `345e0b9` |
 
 `baopaau-rime` is much larger than `zime`; ~17k of its characters are auto-derived
-from Middle Chinese and, per its own upstream README, largely unproofread.
+from Middle Chinese (and largely unproofread according to its own upstream README).
 
-Neither upstream repository carries an explicit licence; the files are vendored
+The files are vendored
 here with attribution (see the site footer and `README.md`).
 
 ### Generated files
